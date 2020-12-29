@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="groli-rest-app" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="groli-rest-app" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="de.digirik.groli.GroliApplication" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
