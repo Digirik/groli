@@ -22,6 +22,7 @@
     </properties>
 
     <modules>
+        <module>groli-database</module>
         <module>groli-rest-app</module>
     </modules>
 
