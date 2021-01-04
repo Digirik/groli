@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="create table users" author="digirik">
+        <createTable tableName="users">
+            <column name="id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="boolean" defaultValue="true"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create users sequence" author="digirik">
+        <createSequence sequenceName="users_sequence" incrementBy="1" dataType="bigint"/>
+    </changeSet>
+
+    <changeSet id="create user_role table" author="digirik">
+        <createTable tableName="user_role">
+            <column name="id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create user_role sequence" author="digirik">
+        <createSequence sequenceName="user_role_sequence" incrementBy="1" dataType="bigint"/>
+    </changeSet>
+
+    <changeSet id="create relation table users_roles" author="digirik">
+        <createTable tableName="users_roles">
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="user_id_fk"/>
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints foreignKeyName="role_id_fk"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

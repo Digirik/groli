@@ -3,6 +3,7 @@
   <component name="EclipseCodeFormatterProjectSettings">
     <option name="projectSpecificProfile">
       <ProjectSpecificProfile>
+        <option name="disabledFileTypes" value=".properties" />
         <option name="formatter" value="ECLIPSE" />
         <option name="pathToConfigFileJava" value="$PROJECT_DIR$/.idea/evosec-eclipse-formatter.xml" />
         <option name="selectedJavaProfile" value="evosec" />
