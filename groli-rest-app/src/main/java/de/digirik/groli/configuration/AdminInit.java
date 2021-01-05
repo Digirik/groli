@@ -1,5 +1,7 @@
 package de.digirik.groli.configuration;
 
+import static java.util.Objects.nonNull;
+
 import java.util.Collections;
 
 import org.springframework.boot.CommandLineRunner;
@@ -28,13 +30,16 @@ public class AdminInit implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
+
+		int numberOfUsers = userRepository.findAll().size();
+
 		UserRole adminRole = userRoleRepository.findByRoleName("ADMIN");
-		if (adminRole == null) {
+		if (nonNull(adminRole) && numberOfUsers == 0) {
 			adminRole = userRoleRepository.save(new UserRole("ADMIN"));
 		}
 
 		User adminUser = userRepository.findByUsername("admin");
-		if (adminUser == null) {
+		if (nonNull(adminUser) && numberOfUsers == 0) {
 			userRepository
 			    .save(new User("admin", passwordEncoder.encode("admin"),
 			        Collections.singletonList(adminRole)));
