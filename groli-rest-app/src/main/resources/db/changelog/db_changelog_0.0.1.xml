@@ -7,7 +7,7 @@
     <changeSet id="create table users" author="digirik">
         <createTable tableName="users">
             <column name="id" type="bigint">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true" primaryKey="true" primaryKeyName="pk_users"/>
             </column>
             <column name="username" type="varchar(255)">
                 <constraints nullable="false"/>
@@ -26,10 +26,10 @@
     <changeSet id="create user_role table" author="digirik">
         <createTable tableName="user_role">
             <column name="id" type="bigint">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true"/>
             </column>
             <column name="role_name" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true"/>
             </column>
         </createTable>
     </changeSet>
@@ -41,12 +41,56 @@
     <changeSet id="create relation table users_roles" author="digirik">
         <createTable tableName="users_roles">
             <column name="user_id" type="bigint">
-                <constraints foreignKeyName="user_id_fk"/>
+                <constraints foreignKeyName="user_id_fk" references="users(id)"/>
             </column>
             <column name="role_id" type="bigint">
-                <constraints foreignKeyName="role_id_fk"/>
+                <constraints foreignKeyName="role_id_fk" references="users(id)"/>
             </column>
         </createTable>
+    </changeSet>
+
+    <changeSet id="create table grocery_list" author="digirik">
+        <createTable tableName="grocery_list">
+            <column name="id" type="bigint">
+                <constraints nullable="false" unique="true" primaryKey="true" primaryKeyName="pk_grocery_list"/>
+            </column>
+            <column name="created" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" references="users(id)" foreignKeyName="fk_user_grocery_list"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create grocery_list_sequence" author="digirik">
+        <createSequence sequenceName="grocery_list_sequence" incrementBy="1" dataType="bigint"/>
+    </changeSet>
+
+    <changeSet id="create table grocery_list_item" author="digirik">
+        <createTable tableName="grocery_list_item">
+            <column name="id" type="bigint">
+                <constraints nullable="false" unique="true" primaryKey="true" primaryKeyName="pk_grocery_list_item"/>
+            </column>
+            <column name="created" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="grocery_list_id" type="bigint">
+                <constraints nullable="false" references="grocery_list(id)"
+                             foreignKeyName="fk_grocery_list_grocery_list_item"/>
+            </column>
+            <column name="description" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" references="users(id)" foreignKeyName="fk_user_grocery_list_item"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="create grocery_list_item sequence" author="digirik">
+        <createSequence sequenceName="grocery_list_item_sequence" incrementBy="1" dataType="bigint"/>
     </changeSet>
 
 </databaseChangeLog>
