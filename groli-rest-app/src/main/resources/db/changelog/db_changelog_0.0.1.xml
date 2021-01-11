@@ -103,4 +103,13 @@
             </column>
         </createTable>
     </changeSet>
+
+    <changeSet id="add column name to grocery_List" author="digirik">
+        <addColumn tableName="grocery_list">
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
