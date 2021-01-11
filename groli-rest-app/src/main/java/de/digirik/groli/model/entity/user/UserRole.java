@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,18 +15,20 @@ import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "user_role")
 public class UserRole {
 
 	private long id;
-	private String roleName;
+	private Role roleName;
 	private List<User> users;
 
 	public UserRole() {
 	}
 
-	public UserRole(String roleName) {
+	public UserRole(Role roleName) {
 		this.roleName = roleName;
 	}
 
@@ -44,15 +48,17 @@ public class UserRole {
 		this.id = id;
 	}
 
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, unique = true)
-	public String getRoleName() {
+	public Role getRoleName() {
 		return roleName;
 	}
 
-	public void setRoleName(String rolename) {
-		this.roleName = rolename;
+	public void setRoleName(Role roleName) {
+		this.roleName = roleName;
 	}
 
+	@JsonBackReference
 	@ManyToMany
 	@JoinTable(
 	        name = "users_roles",

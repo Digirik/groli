@@ -44,7 +44,7 @@
                 <constraints foreignKeyName="user_id_fk" references="users(id)"/>
             </column>
             <column name="role_id" type="bigint">
-                <constraints foreignKeyName="role_id_fk" references="users(id)"/>
+                <constraints foreignKeyName="role_id_fk" references="user_role(id)"/>
             </column>
         </createTable>
     </changeSet>

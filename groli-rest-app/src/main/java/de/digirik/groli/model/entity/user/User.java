@@ -1,8 +1,24 @@
 package de.digirik.groli.model.entity.user;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -53,6 +69,8 @@ public class User {
 		this.username = username;
 	}
 
+	@JsonIgnore
+	@Column(nullable = false)
 	public String getPassword() {
 		return password;
 	}
@@ -69,7 +87,7 @@ public class User {
 		this.active = active;
 	}
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 	        name = "users_roles",
 	        joinColumns = @JoinColumn(
@@ -84,5 +102,18 @@ public class User {
 
 	public void setRoles(List<UserRole> roles) {
 		this.roles = roles;
+	}
+
+	@Transient
+	public void addRole(UserRole userRole) {
+		Set<UserRole> userRolesSet = new HashSet<>(this.roles);
+		userRolesSet.add(userRole);
+		List<UserRole> userRoles = new ArrayList<>(userRolesSet);
+		setRoles(userRoles);
+	}
+
+	@Transient
+	public void removeRole(UserRole userRole) {
+		this.roles.remove(userRole);
 	}
 }

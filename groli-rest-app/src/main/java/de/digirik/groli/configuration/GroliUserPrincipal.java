@@ -1,6 +1,5 @@
 package de.digirik.groli.configuration;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,10 +91,9 @@ public class GroliUserPrincipal implements UserDetails {
 	}
 
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		List<GrantedAuthority> grantedAuthorities =
-		        new ArrayList<GrantedAuthority>();
 		return authorities.stream()
-		    .map(userRole -> new SimpleGrantedAuthority(userRole.getRoleName()))
+		    .map(userRole -> new SimpleGrantedAuthority(
+		        "ROLE_" + userRole.getRoleName()))
 		    .collect(Collectors.toList());
 	}
 
