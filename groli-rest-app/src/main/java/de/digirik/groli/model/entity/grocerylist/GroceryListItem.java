@@ -32,6 +32,12 @@ public class GroceryListItem {
 		this.created = new Date();
 	}
 
+	public GroceryListItem(User addedBy, String description) {
+		this.created = new Date();
+		this.addedBy = addedBy;
+		this.description = description;
+	}
+
 	@Id
 	@GeneratedValue(
 	        strategy = GenerationType.SEQUENCE,
