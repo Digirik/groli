@@ -93,4 +93,14 @@
         <createSequence sequenceName="grocery_list_item_sequence" incrementBy="1" dataType="bigint"/>
     </changeSet>
 
+    <changeSet id="create relation table grocery_list_invited_users" author="digirik">
+        <createTable tableName="grocery_list_invited_users">
+            <column name="grocery_list_id" type="bigint">
+                <constraints foreignKeyName="grocery_list_id_fd" references="grocery_list(id)"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="user_id_fk" references="users(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>
