@@ -2,13 +2,11 @@ package de.digirik.groli.model.dto.request;
 
 import java.util.List;
 
-import de.digirik.groli.model.entity.user.Role;
-
 public class RegistrationRequest {
 
 	private String username;
 	private String password;
-	private List<Role> roleNames;
+	private List<String> roleNames;
 
 	public String getUsername() {
 		return username;
@@ -26,11 +24,11 @@ public class RegistrationRequest {
 		this.password = password;
 	}
 
-	public List<Role> getRoleNames() {
+	public List<String> getRoleNames() {
 		return roleNames;
 	}
 
-	public void setRoleNames(List<Role> roleNames) {
+	public void setRoleNames(List<String> roleNames) {
 		this.roleNames = roleNames;
 	}
 }

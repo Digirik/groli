@@ -1,8 +1,10 @@
 package de.digirik.groli.service.user.impl;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -17,7 +19,9 @@ import de.digirik.groli.model.exception.UserAlreadyExistsException;
 import de.digirik.groli.repository.user.UserRepository;
 import de.digirik.groli.repository.user.UserRoleRepository;
 import de.digirik.groli.service.user.UserService;
+import javassist.NotFoundException;
 
+//TODO: create own repo so we can use refresh()
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -58,10 +62,17 @@ public class UserServiceImpl implements UserService {
 			    "Username already in use. Please choose a different username");
 		}
 
-		List<UserRole> userRoles = userRoleRepository
-		    .findALlByRoleNameIn(registrationRequest.getRoleNames());
-		User newUser = new User(username, password, userRoles);
-		return userRepository.save(newUser);
+		User savedUser = userRepository.save(new User(username, password));
+
+		List<UserRole> userRoles = registrationRequest.getRoleNames()
+		    .stream()
+		    .map(Role::valueOf)
+		    .map(role -> new UserRole(savedUser, role))
+		    .collect(Collectors.toList());
+
+		savedUser.setRoles(userRoleRepository.saveAll(userRoles));
+
+		return savedUser;
 	}
 
 	@Override
@@ -72,11 +83,24 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public User addRole(String username, Role roleName) {
+	public User addRole(String username, Role roleName)
+	        throws NotFoundException {
+
 		User user = userRepository.findByUsername(username);
-		UserRole userRole = userRoleRepository.findByRoleName(roleName);
-		user.addRole(userRole);
-		return userRepository.save(user);
+		if (isNull(user)) {
+			throw new NotFoundException(
+			    "User with username " + username + "does not exist.");
+		}
+
+		UserRole userRole =
+		        userRoleRepository.findByUserAndRoleName(user, roleName);
+		if (nonNull(userRole)) {
+			return user;
+		}
+
+		user.addRole(userRoleRepository.save(new UserRole(user, roleName)));
+
+		return user;
 	}
 
 }

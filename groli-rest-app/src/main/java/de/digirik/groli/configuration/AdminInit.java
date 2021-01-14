@@ -2,8 +2,7 @@ package de.digirik.groli.configuration;
 
 import static java.util.Objects.isNull;
 
-import java.util.Collections;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -21,29 +20,32 @@ public class AdminInit implements CommandLineRunner {
 	private final UserRoleRepository userRoleRepository;
 	private final PasswordEncoder passwordEncoder;
 
+	private final String adminUsername;
+	private final String adminPasswordHash;
+
 	public AdminInit(UserRepository userRepository,
 	        UserRoleRepository userRoleRepository,
-	        PasswordEncoder passwordEncoder) {
+	        PasswordEncoder passwordEncoder,
+	        @Value("${groli.security.admin.init-username}") String adminUsername,
+	        @Value("${groli.security.admin.init-pw-hash}") String adminPasswordHash) {
 		this.userRepository = userRepository;
 		this.userRoleRepository = userRoleRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.adminUsername = adminUsername;
+		this.adminPasswordHash = adminPasswordHash;
 	}
 
+	// todo: add pw reset function and require pw change on first login
 	@Override
 	public void run(String... args) {
 
-		int numberOfUsers = userRepository.findAll().size();
-
-		UserRole adminRole = userRoleRepository.findByRoleName(Role.ADMIN);
-		if (isNull(adminRole)) {
-			adminRole = userRoleRepository.save(new UserRole(Role.ADMIN));
-		}
-
 		User adminUser = userRepository.findByUsername("admin");
-		if (isNull(adminUser) && numberOfUsers == 0) {
-			userRepository
-			    .save(new User("admin", passwordEncoder.encode("admin"),
-			        Collections.singletonList(adminRole)));
+		if (isNull(adminUser)) {
+			User savedAdminUser = userRepository
+			    .save(new User(adminUsername, adminPasswordHash));
+
+			UserRole adminAdmin = new UserRole(savedAdminUser, Role.ADMIN);
+			userRoleRepository.save(adminAdmin);
 		}
 	}
 }

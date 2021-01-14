@@ -6,6 +6,7 @@ import de.digirik.groli.model.dto.request.RegistrationRequest;
 import de.digirik.groli.model.entity.user.Role;
 import de.digirik.groli.model.entity.user.User;
 import de.digirik.groli.model.exception.UserAlreadyExistsException;
+import javassist.NotFoundException;
 
 public interface UserService {
 
@@ -18,6 +19,6 @@ public interface UserService {
 
 	void deleteUser(String username);
 
-	User addRole(String username, Role roleName);
+	User addRole(String username, Role roleName) throws NotFoundException;
 
 }

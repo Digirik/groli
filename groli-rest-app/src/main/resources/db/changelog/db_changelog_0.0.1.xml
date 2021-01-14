@@ -29,24 +29,16 @@
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="role_name" type="varchar(255)">
-                <constraints nullable="false" unique="true"/>
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" references="users(id)" foreignKeyName="fk_user_role_user"/>
             </column>
         </createTable>
     </changeSet>
 
     <changeSet id="create user_role sequence" author="digirik">
         <createSequence sequenceName="user_role_sequence" incrementBy="1" dataType="bigint"/>
-    </changeSet>
-
-    <changeSet id="create relation table users_roles" author="digirik">
-        <createTable tableName="users_roles">
-            <column name="user_id" type="bigint">
-                <constraints foreignKeyName="user_id_fk" references="users(id)"/>
-            </column>
-            <column name="role_id" type="bigint">
-                <constraints foreignKeyName="role_id_fk" references="user_role(id)"/>
-            </column>
-        </createTable>
     </changeSet>
 
     <changeSet id="create table grocery_list" author="digirik">

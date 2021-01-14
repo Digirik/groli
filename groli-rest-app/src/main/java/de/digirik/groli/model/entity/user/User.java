@@ -1,9 +1,6 @@
 package de.digirik.groli.model.entity.user;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,9 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -31,12 +26,6 @@ public class User {
 	private List<UserRole> roles;
 
 	public User() {
-	}
-
-	public User(String username, String password, List<UserRole> roles) {
-		this.username = username;
-		this.password = password;
-		this.roles = roles;
 	}
 
 	public User(String username, String password) {
@@ -87,15 +76,7 @@ public class User {
 		this.active = active;
 	}
 
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(
-	        name = "users_roles",
-	        joinColumns = @JoinColumn(
-	                name = "user_id",
-	                referencedColumnName = "id"),
-	        inverseJoinColumns = @JoinColumn(
-	                name = "role_id",
-	                referencedColumnName = "id"))
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
 	public List<UserRole> getRoles() {
 		return roles;
 	}
@@ -105,15 +86,8 @@ public class User {
 	}
 
 	@Transient
-	public void addRole(UserRole userRole) {
-		Set<UserRole> userRolesSet = new HashSet<>(this.roles);
-		userRolesSet.add(userRole);
-		List<UserRole> userRoles = new ArrayList<>(userRolesSet);
-		setRoles(userRoles);
+	public void addRole(UserRole role) {
+		this.roles.add(role);
 	}
 
-	@Transient
-	public void removeRole(UserRole userRole) {
-		this.roles.remove(userRole);
-	}
 }

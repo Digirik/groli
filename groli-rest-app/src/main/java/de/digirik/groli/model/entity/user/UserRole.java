@@ -1,7 +1,5 @@
 package de.digirik.groli.model.entity.user;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -10,8 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -23,12 +20,13 @@ public class UserRole {
 
 	private long id;
 	private Role roleName;
-	private List<User> users;
+	private User user;
 
 	public UserRole() {
 	}
 
-	public UserRole(Role roleName) {
+	public UserRole(User user, Role roleName) {
+		this.user = user;
 		this.roleName = roleName;
 	}
 
@@ -49,7 +47,7 @@ public class UserRole {
 	}
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	public Role getRoleName() {
 		return roleName;
 	}
@@ -59,21 +57,14 @@ public class UserRole {
 	}
 
 	@JsonBackReference
-	@ManyToMany
-	@JoinTable(
-	        name = "users_roles",
-	        joinColumns = @JoinColumn(
-	                name = "user_id",
-	                referencedColumnName = "id"),
-	        inverseJoinColumns = @JoinColumn(
-	                name = "role_id",
-	                referencedColumnName = "id"))
-	public List<User> getUsers() {
-		return users;
+	@ManyToOne
+	@JoinColumn(name = "user_id", referencedColumnName = "id")
+	public User getUser() {
+		return user;
 	}
 
-	public void setUsers(List<User> users) {
-		this.users = users;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 }
