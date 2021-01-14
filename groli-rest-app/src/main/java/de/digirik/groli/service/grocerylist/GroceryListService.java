@@ -45,5 +45,5 @@ public interface GroceryListService {
 
 	void removeGroceryListItem(long groceryListId, long groceryListItemId)
 	        throws GroceryListDoesNotExistException,
-	        NotYourGroceryListException;
+	        NotYourGroceryListException, GroceryListItemDoesNotExistException;
 }

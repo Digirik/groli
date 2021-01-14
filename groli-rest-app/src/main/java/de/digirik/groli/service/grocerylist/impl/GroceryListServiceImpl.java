@@ -205,7 +205,7 @@ public class GroceryListServiceImpl implements GroceryListService {
 	@Override
 	public void removeGroceryListItem(long groceryListId,
 	        long groceryListItemId) throws GroceryListDoesNotExistException,
-	        NotYourGroceryListException {
+	        NotYourGroceryListException, GroceryListItemDoesNotExistException {
 
 		GroceryList groceryList = groceryListRepository.getById(groceryListId);
 
@@ -215,5 +215,10 @@ public class GroceryListServiceImpl implements GroceryListService {
 			    "Your are neither the owner of nor invited to the grocery list with id "
 			            + groceryListId + ", don't try deleting items.");
 		}
+
+		GroceryListItem groceryListItem =
+		        groceryListItemRepository.getById(groceryListId);
+
+		groceryListItemRepository.delete(groceryListItem);
 	}
 }

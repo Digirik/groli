@@ -93,7 +93,10 @@ public class GroceryListController {
 
 	@PostMapping("/remove/item")
 	private void removeGroceryListItem(long groceryListId,
-	        long groceryListItemId) {
-
+	        long groceryListItemId) throws NotYourGroceryListException,
+	        GroceryListDoesNotExistException,
+	        GroceryListItemDoesNotExistException {
+		groceryListService.removeGroceryListItem(groceryListId,
+		    groceryListItemId);
 	}
 }
