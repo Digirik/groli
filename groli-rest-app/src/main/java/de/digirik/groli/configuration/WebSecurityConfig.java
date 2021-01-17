@@ -45,17 +45,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return new BCryptPasswordEncoder(12);
 	}
 
-	// Not needed for now because we do that in the AuthTokenFilter?
-	// @Bean
-	// public DaoAuthenticationProvider authenticationProvider(
-	// GroliUserDetailsService groliUserDetailsService) {
-	// final DaoAuthenticationProvider authProvider =
-	// new DaoAuthenticationProvider();
-	// authProvider.setUserDetailsService(groliUserDetailsService);
-	// authProvider.setPasswordEncoder(this.passwordEncoder());
-	// return authProvider;
-	// }
-
 	@Override
 	public void configure(
 	        AuthenticationManagerBuilder authenticationManagerBuilder)

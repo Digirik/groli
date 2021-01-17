@@ -14,6 +14,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import de.digirik.groli.model.entity.user.User;
@@ -64,6 +65,7 @@ public class GroceryListItem {
 		this.created = created;
 	}
 
+	@JsonIgnore
 	@ManyToOne
 	@NotNull
 	@JoinColumn(name = "grocery_list_id")

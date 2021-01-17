@@ -7,7 +7,11 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import de.digirik.groli.model.dto.request.CreateGroceryListRequest;
+import de.digirik.groli.model.dto.request.grocerylist.AddGroceryListItemRequest;
+import de.digirik.groli.model.dto.request.grocerylist.CreateGroceryListRequest;
+import de.digirik.groli.model.dto.request.grocerylist.EditGroceryListItemRequest;
+import de.digirik.groli.model.dto.request.grocerylist.InviteToGroceryListRequest;
+import de.digirik.groli.model.dto.request.grocerylist.RenameGroceryListRequest;
 import de.digirik.groli.model.entity.grocerylist.GroceryList;
 import de.digirik.groli.model.entity.grocerylist.GroceryListItem;
 import de.digirik.groli.model.entity.user.User;
@@ -109,15 +113,20 @@ public class GroceryListServiceImpl implements GroceryListService {
 			            + groceryListId + ". Only the owner can delete it.");
 		}
 
+		groceryListItemRepository.deleteAll(groceryList.getGroceryListItems());
+
 		groceryListRepository.delete(groceryList);
 	}
 
 	// TODO: rename this and controller method to editGroceryListName?
 	@Override
 	@Transactional
-	public GroceryList editGroceryList(long groceryListId,
-	        String groceryListName) throws GroceryListDoesNotExistException,
+	public GroceryList editGroceryList(
+	        RenameGroceryListRequest renameGroceryListRequest)
+	        throws GroceryListDoesNotExistException,
 	        NotYourGroceryListException {
+
+		long groceryListId = renameGroceryListRequest.getGroceryListId();
 
 		GroceryList groceryList = groceryListRepository.getById(groceryListId);
 
@@ -129,16 +138,22 @@ public class GroceryListServiceImpl implements GroceryListService {
 			            + ". Only the owner can change its name.");
 		}
 
-		groceryList.setName(groceryListName);
+		groceryList.setName(renameGroceryListRequest.getName());
 
-		return groceryListRepository.save(groceryList);
+		GroceryList savedGroceryList = groceryListRepository.save(groceryList);
+		savedGroceryList.getInvitedUsers()
+		    .forEach(invitedUser -> invitedUser.getId());
+		return savedGroceryList;
 	}
 
 	@Override
 	@Transactional
-	public GroceryList inviteToGroceryList(long groceryListId,
-	        List<String> usernames) throws GroceryListDoesNotExistException,
+	public GroceryList inviteToGroceryList(
+	        InviteToGroceryListRequest inviteToGroceryListRequest)
+	        throws GroceryListDoesNotExistException,
 	        NotYourGroceryListException {
+
+		long groceryListId = inviteToGroceryListRequest.getGroceryListId();
 
 		GroceryList groceryList = groceryListRepository.getById(groceryListId);
 
@@ -149,18 +164,24 @@ public class GroceryListServiceImpl implements GroceryListService {
 			            + groceryListId + ". Only the owner can invite users.");
 		}
 
-		List<User> newlyInvitedUsers =
-		        userService.findAllByUsernameIn(usernames);
+		List<User> newlyInvitedUsers = userService
+		    .findAllByUsernameIn(inviteToGroceryListRequest.getUsernames());
 		newlyInvitedUsers.forEach(groceryList::addInvitedUser);
 
-		return groceryListRepository.save(groceryList);
+		GroceryList savedGroceryList = groceryListRepository.save(groceryList);
+		savedGroceryList.getInvitedUsers()
+		    .forEach(invitedUser -> invitedUser.getId());
+		return savedGroceryList;
 	}
 
 	@Override
 	@Transactional
-	public GroceryListItem addItemToGroceryList(long groceryListId,
-	        String description) throws GroceryListDoesNotExistException,
+	public GroceryListItem addItemToGroceryList(
+	        AddGroceryListItemRequest addGroceryListItemRequest)
+	        throws GroceryListDoesNotExistException,
 	        NotYourGroceryListException {
+
+		long groceryListId = addGroceryListItemRequest.getGroceryListId();
 
 		GroceryList groceryList = groceryListRepository.getById(groceryListId);
 
@@ -171,20 +192,23 @@ public class GroceryListServiceImpl implements GroceryListService {
 			            + groceryListId + ", don't try editing it.");
 		}
 
-		GroceryListItem groceryListItem =
-		        new GroceryListItem(requestingUser, description);
+		GroceryListItem groceryListItem = new GroceryListItem(requestingUser,
+		    addGroceryListItemRequest.getDescription());
 		groceryListItem.setGroceryList(groceryList);
 
 		return groceryListItemRepository.save(groceryListItem);
 	}
 
+	// returns addedBy users roles 3times??
 	// todo: check if item belongs to grocery list?
 	@Override
 	@Transactional
-	public GroceryListItem editGroceryListItem(long groceryListId,
-	        long groceryListItemId, String description)
+	public GroceryListItem editGroceryListItem(
+	        EditGroceryListItemRequest editGroceryListItemRequest)
 	        throws GroceryListDoesNotExistException,
 	        NotYourGroceryListException, GroceryListItemDoesNotExistException {
+
+		long groceryListId = editGroceryListItemRequest.getGroceryListId();
 
 		GroceryList groceryList = groceryListRepository.getById(groceryListId);
 
@@ -195,29 +219,32 @@ public class GroceryListServiceImpl implements GroceryListService {
 			            + groceryListId + ", don't try editing it.");
 		}
 
-		GroceryListItem groceryListItem =
-		        groceryListItemRepository.getById(groceryListItemId);
-		groceryListItem.setDescription(description);
+		GroceryListItem groceryListItem = groceryListItemRepository
+		    .getById(editGroceryListItemRequest.getGroceryListItemId());
+		groceryListItem
+		    .setDescription(editGroceryListItemRequest.getDescription());
 
 		return groceryListItemRepository.save(groceryListItem);
 	}
 
+	// TODO: rename to deleteGroceryListItem?
 	@Override
-	public void removeGroceryListItem(long groceryListId,
-	        long groceryListItemId) throws GroceryListDoesNotExistException,
-	        NotYourGroceryListException, GroceryListItemDoesNotExistException {
+	@Transactional
+	public void removeGroceryListItem(long groceryListItemId)
+	        throws NotYourGroceryListException,
+	        GroceryListItemDoesNotExistException {
 
-		GroceryList groceryList = groceryListRepository.getById(groceryListId);
+		GroceryListItem groceryListItem =
+		        groceryListItemRepository.getById(groceryListItemId);
+
+		GroceryList groceryList = groceryListItem.getGroceryList();
 
 		User requestingUser = authService.getAuthenticatedUser();
 		if (groceryList.userMayNotEdit(requestingUser)) {
 			throw new NotYourGroceryListException(
 			    "Your are neither the owner of nor invited to the grocery list with id "
-			            + groceryListId + ", don't try deleting items.");
+			            + groceryList.getId() + ", don't try deleting items.");
 		}
-
-		GroceryListItem groceryListItem =
-		        groceryListItemRepository.getById(groceryListId);
 
 		groceryListItemRepository.delete(groceryListItem);
 	}

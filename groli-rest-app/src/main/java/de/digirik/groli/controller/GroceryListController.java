@@ -2,6 +2,8 @@ package de.digirik.groli.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,7 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.digirik.groli.model.dto.request.CreateGroceryListRequest;
+import de.digirik.groli.model.dto.request.IdRequest;
+import de.digirik.groli.model.dto.request.grocerylist.AddGroceryListItemRequest;
+import de.digirik.groli.model.dto.request.grocerylist.CreateGroceryListRequest;
+import de.digirik.groli.model.dto.request.grocerylist.EditGroceryListItemRequest;
+import de.digirik.groli.model.dto.request.grocerylist.InviteToGroceryListRequest;
+import de.digirik.groli.model.dto.request.grocerylist.RenameGroceryListRequest;
 import de.digirik.groli.model.entity.grocerylist.GroceryList;
 import de.digirik.groli.model.entity.grocerylist.GroceryListItem;
 import de.digirik.groli.model.exception.GroceryListDoesNotExistException;
@@ -19,7 +26,7 @@ import de.digirik.groli.service.grocerylist.GroceryListService;
 
 @RestController
 @RequestMapping("/api/user/grocery-list")
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 public class GroceryListController {
 
 	private final GroceryListService groceryListService;
@@ -29,74 +36,77 @@ public class GroceryListController {
 	}
 
 	@GetMapping("/own")
-	private List<GroceryList> findAllOwnedGroceryLists() {
+	public List<GroceryList> findAllOwnedGroceryLists() {
 		return groceryListService.findAllOwnedGroceryLists();
 	}
 
 	@GetMapping("/invited")
-	private List<GroceryList> findAllInvitedGroceryLists() {
+	public List<GroceryList> findAllInvitedGroceryLists() {
 		return groceryListService.findAllInvitedGroceryLists();
 	}
 
 	@GetMapping("/invitable")
-	private List<String> findAllInvitableUsernames(long groceryListId)
+	public List<String> findAllInvitableUsernames(
+	        @RequestBody @Valid IdRequest idRequest)
 	        throws NotYourGroceryListException,
 	        GroceryListDoesNotExistException {
-		return groceryListService.findAllInvitableUsernames(groceryListId);
+		return groceryListService.findAllInvitableUsernames(idRequest.getId());
 	}
 
 	@PostMapping("/create")
 	public GroceryList createGroceryList(
-	        @RequestBody CreateGroceryListRequest createGroceryListRequest) {
+	        @RequestBody @Valid CreateGroceryListRequest createGroceryListRequest) {
 		return groceryListService.createGroceryList(createGroceryListRequest);
 	}
 
 	@PostMapping("/delete")
-	public void deleteGroceryList(long groceryListId)
+	public void deleteGroceryList(@RequestBody @Valid IdRequest idRequest)
 	        throws NotYourGroceryListException,
 	        GroceryListDoesNotExistException {
-		groceryListService.deleteGroceryList(groceryListId);
+		groceryListService.deleteGroceryList(idRequest.getId());
 	}
 
 	@PostMapping("/edit/name")
-	public GroceryList editGroceryList(long groceryListId,
-	        String groceryListName) throws NotYourGroceryListException,
+	public GroceryList editGroceryList(
+	        @RequestBody @Valid RenameGroceryListRequest renameGroceryListRequest)
+	        throws NotYourGroceryListException,
 	        GroceryListDoesNotExistException {
-		return groceryListService.editGroceryList(groceryListId,
-		    groceryListName);
+		return groceryListService.editGroceryList(renameGroceryListRequest);
 	}
 
 	@PostMapping("/invite")
-	public GroceryList inviteToGroceryList(long groceryListId,
-	        List<String> usernames) throws NotYourGroceryListException,
+	public GroceryList inviteToGroceryList(
+	        @RequestBody @Valid InviteToGroceryListRequest inviteToGroceryListRequest)
+	        throws NotYourGroceryListException,
 	        GroceryListDoesNotExistException {
-		return groceryListService.inviteToGroceryList(groceryListId, usernames);
+		return groceryListService
+		    .inviteToGroceryList(inviteToGroceryListRequest);
 	}
 
 	@PostMapping("/add/item")
-	private GroceryListItem addItemToGroceryList(long groceryListId,
-	        String description) throws NotYourGroceryListException,
+	public GroceryListItem addItemToGroceryList(
+	        @RequestBody @Valid AddGroceryListItemRequest addGroceryListItemRequest)
+	        throws NotYourGroceryListException,
 	        GroceryListDoesNotExistException {
-		return groceryListService.addItemToGroceryList(groceryListId,
-		    description);
+		return groceryListService
+		    .addItemToGroceryList(addGroceryListItemRequest);
 	}
 
 	@PostMapping("/edit/item")
-	private GroceryListItem editGroceryListItem(long groceryListId,
-	        long groceryListItemId, String description)
+	public GroceryListItem editGroceryListItem(
+	        @RequestBody @Valid EditGroceryListItemRequest editGroceryListItemRequest)
 	        throws GroceryListDoesNotExistException,
 	        GroceryListItemDoesNotExistException, NotYourGroceryListException {
 
-		return groceryListService.editGroceryListItem(groceryListId,
-		    groceryListItemId, description);
+		return groceryListService
+		    .editGroceryListItem(editGroceryListItemRequest);
 	}
 
 	@PostMapping("/remove/item")
-	private void removeGroceryListItem(long groceryListId,
-	        long groceryListItemId) throws NotYourGroceryListException,
+	public void removeGroceryListItem(@RequestBody @Valid IdRequest idRequest)
+	        throws NotYourGroceryListException,
 	        GroceryListDoesNotExistException,
 	        GroceryListItemDoesNotExistException {
-		groceryListService.removeGroceryListItem(groceryListId,
-		    groceryListItemId);
+		groceryListService.removeGroceryListItem(idRequest.getId());
 	}
 }

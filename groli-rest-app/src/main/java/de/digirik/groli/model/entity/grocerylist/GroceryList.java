@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -27,6 +26,7 @@ import com.sun.istack.NotNull;
 
 import de.digirik.groli.model.entity.user.User;
 
+//TODO: remove fetch type eager from entities and write own repository that can init fields or ignore invitedUsers field on serialisation and add controller to get already invited users
 @Entity
 public class GroceryList {
 
@@ -127,10 +127,7 @@ public class GroceryList {
 		setInvitedUsers(invitedUsers);
 	}
 
-	@OneToMany(
-	        cascade = CascadeType.ALL,
-	        mappedBy = "groceryList",
-	        fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "groceryList", fetch = FetchType.EAGER)
 	public List<GroceryListItem> getGroceryListItems() {
 		return groceryListItems;
 	}
@@ -149,7 +146,6 @@ public class GroceryList {
 		return !userIsOwner(user);
 	}
 
-	// TODO: check if you have to implement equals (maybe hash code via id?)
 	@Transient
 	public boolean userMayEdit(User user) {
 		return (this.owner.equals(user) || this.invitedUsers.stream()

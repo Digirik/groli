@@ -1,5 +1,7 @@
 package de.digirik.groli.model.entity.user;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -67,4 +69,19 @@ public class UserRole {
 		this.user = user;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		UserRole userRole = (UserRole) o;
+		return id == userRole.id && roleName == userRole.roleName
+		        && user.equals(userRole.user);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, roleName, user);
+	}
 }
